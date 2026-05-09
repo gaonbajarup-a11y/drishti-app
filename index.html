@@ -5,250 +5,270 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DRISHTI AI</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  background: #08000F;
-  color: white;
-  font-family: Arial, sans-serif;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-}
-.header {
-  text-align: center;
-  padding: 30px 0 20px;
-}
-.logo { font-size: 48px; color: #F59E0B; font-weight: bold; }
-.tagline { color: #A855F7; font-size: 14px; margin-top: 5px; }
-.chat-box {
-  width: 100%;
-  max-width: 700px;
-  background: #1E0A3C;
-  border-radius: 16px;
-  padding: 20px;
-  flex: 1;
-  min-height: 400px;
-  max-height: 60vh;
-  overflow-y: auto;
-  margin-bottom: 20px;
-}
-.message {
-  margin: 10px 0;
-  padding: 12px 16px;
-  border-radius: 12px;
-  max-width: 85%;
-  line-height: 1.5;
-}
-.user-msg {
-  background: #7C3AED;
-  margin-left: auto;
-  text-align: right;
-}
-.drishti-msg {
-  background: #130228;
-  border-left: 3px solid #F59E0B;
-}
-.drishti-name {
-  color: #F59E0B;
-  font-size: 12px;
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-.icons-row {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-.icon-btn {
-  background: #1E0A3C;
-  border: 2px solid #7C3AED;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.icon-btn:hover { background: #7C3AED; }
-.icon-btn.active { background: #7C3AED; border-color: #F59E0B; }
-.input-row {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  max-width: 700px;
-}
-.text-input {
-  flex: 1;
-  background: #1E0A3C;
-  border: 2px solid #7C3AED;
-  color: white;
-  padding: 14px;
-  border-radius: 12px;
-  font-size: 15px;
-  outline: none;
-}
-.send-btn {
-  background: #7C3AED;
-  border: none;
-  color: white;
-  padding: 14px 20px;
-  border-radius: 12px;
-  font-size: 20px;
-  cursor: pointer;
-}
-.mic-btn {
-  background: #EC4899;
-  border: none;
-  color: white;
-  padding: 14px 20px;
-  border-radius: 12px;
-  font-size: 20px;
-  cursor: pointer;
-}
-.mic-btn.listening { background: #DC2626; animation: pulse 1s infinite; }
-@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-.status { color: #6B7280; font-size: 12px; text-align: center; margin-top: 8px; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#08000F;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.header{width:100%;background:linear-gradient(180deg,#1A0533,#08000F);padding:18px 20px 12px;text-align:center;border-bottom:2px solid #7C3AED;position:sticky;top:0;z-index:100}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:10px}
+.eye{font-size:30px}
+.logo{font-size:36px;font-weight:900;color:#F59E0B;letter-spacing:3px}
+.tagline{color:#A855F7;font-size:12px;margin-top:4px;letter-spacing:1px}
+.modes{display:flex;gap:8px;padding:12px 16px;width:100%;max-width:760px;justify-content:center;flex-wrap:wrap}
+.mbtn{background:#1E0A3C;border:2px solid #4C1D95;color:#C4B5FD;padding:10px 18px;border-radius:50px;font-size:13px;cursor:pointer;transition:all 0.25s;font-weight:600}
+.mbtn:hover{border-color:#7C3AED;color:#fff}
+.mbtn.on{background:#7C3AED;border-color:#F59E0B;color:#fff;box-shadow:0 0 16px #7C3AED88}
+.chat{width:100%;max-width:760px;flex:1;padding:12px 14px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;height:calc(100vh - 260px)}
+.chat::-webkit-scrollbar{width:4px}
+.chat::-webkit-scrollbar-thumb{background:#4C1D95;border-radius:4px}
+.bubble{max-width:82%;padding:12px 16px;border-radius:18px;font-size:14.5px;line-height:1.6;animation:fadeUp 0.3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.bot{background:#1E0A3C;border-left:3px solid #F59E0B;align-self:flex-start}
+.usr{background:linear-gradient(135deg,#7C3AED,#5B21B6);align-self:flex-end;text-align:right;border-bottom-right-radius:4px}
+.bname{font-size:11px;font-weight:700;color:#F59E0B;margin-bottom:5px}
+.bubble pre{background:#0D001F;padding:12px;border-radius:10px;overflow-x:auto;margin:8px 0;border-left:3px solid #7C3AED}
+.bubble code{background:#0D001F;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:13px;color:#86EFAC}
+.bubble pre code{background:transparent;padding:0}
+.typing{display:flex;gap:5px;padding:14px 18px;background:#1E0A3C;border-left:3px solid #F59E0B;border-radius:18px;align-self:flex-start;width:70px}
+.dot{width:8px;height:8px;background:#A855F7;border-radius:50%;animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+.ibar{width:100%;max-width:760px;padding:10px 14px 20px;background:#08000F;border-top:1px solid #2D1155;position:sticky;bottom:0}
+.irow{display:flex;gap:8px;align-items:center;background:#1E0A3C;border:2px solid #7C3AED;border-radius:50px;padding:6px 6px 6px 16px;transition:border-color .2s}
+.irow:focus-within{border-color:#F59E0B}
+.tinp{flex:1;background:transparent;border:none;color:#fff;font-size:15px;outline:none;padding:6px 0}
+.tinp::placeholder{color:#6B7280}
+.micbtn,.sendbtn{width:44px;height:44px;border-radius:50%;border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.micbtn{background:#EC4899}
+.micbtn.listening{background:#DC2626;animation:pulse 1s infinite;box-shadow:0 0 16px #DC262688}
+.sendbtn{background:#7C3AED}
+.sendbtn:hover{background:#6D28D9;transform:scale(1.05)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.sbar{text-align:center;font-size:11px;color:#4B5563;margin-top:6px}
+.sbar.active{color:#A855F7}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{background:#2D1155;border:1px solid #7C3AED;color:#C4B5FD;padding:7px 14px;border-radius:50px;font-size:12px;cursor:pointer;transition:all .2s}
+.chip:hover{background:#7C3AED;color:#fff}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="logo">👁 DRISHTI</div>
-  <div class="tagline">Aapki Screen Dekhe. Hindi Mein Guide Kare. Hamesha Saath.</div>
+  <div class="logo-row">
+    <span class="eye">👁</span>
+    <span class="logo">DRISHTI</span>
+  </div>
+  <div class="tagline">Aapki Screen Dekhe · Hindi Mein Guide Kare · Hamesha Saath</div>
 </div>
 
-<div class="icons-row">
-  <button class="icon-btn" onclick="setMode('voice')">🎙 Voice</button>
-  <button class="icon-btn" onclick="setMode('code')">💻 Coding</button>
-  <button class="icon-btn" onclick="setMode('web')">🌐 Website</button>
-  <button class="icon-btn" onclick="setMode('chat')">💬 Baat Karo</button>
+<div class="modes">
+  <button class="mbtn on" onclick="setMode('chat',this)">💬 Baat Karo</button>
+  <button class="mbtn" onclick="setMode('code',this)">💻 Coding</button>
+  <button class="mbtn" onclick="setMode('web',this)">🌐 Website</button>
+  <button class="mbtn" onclick="setMode('voice',this)">🎙 Voice</button>
 </div>
 
-<div class="chat-box" id="chatBox">
-  <div class="message drishti-msg">
-    <div class="drishti-name">👁 DRISHTI</div>
-    Namaste! Main DRISHTI hoon. Aap mujhse kuch bhi pooch sakte hain — coding, website, ya bas baat karo. Boliye!
+<div class="chat" id="chat">
+  <div class="bubble bot">
+    <div class="bname">👁 DRISHTI</div>
+    Namaste Vipul! 🙏 Main DRISHTI hoon — aapka personal AI guide.<br><br>
+    Main kar sakti hoon:<br>
+    • Coding sikhana — Python, HTML, JavaScript<br>
+    • Website banana — step by step<br>
+    • Kuch bhi poochho — main hoon!<br><br>
+    Kya karna hai aaj?
+    <div class="chips">
+      <span class="chip" onclick="quickSend('Python mein calculator banao')">🐍 Python Calculator</span>
+      <span class="chip" onclick="quickSend('Meri pehli website kaise banao?')">🌐 Pehli Website</span>
+      <span class="chip" onclick="quickSend('JavaScript kya hai?')">⚡ JavaScript</span>
+      <span class="chip" onclick="quickSend('Aaj ka mausam kaisa hai?')">💬 Baat Karo</span>
+    </div>
   </div>
 </div>
 
-<div class="input-row">
-  <input class="text-input" id="userInput" placeholder="Kuch bhi poochho..." onkeypress="if(event.key==='Enter')sendMsg()"/>
-  <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎙</button>
-  <button class="send-btn" onclick="sendMsg()">➤</button>
+<div class="ibar">
+  <div class="irow">
+    <input class="tinp" id="inp" placeholder="Kuch bhi poochho Vipul..." onkeypress="if(event.key==='Enter')send()"/>
+    <button class="micbtn" id="mic" onclick="toggleMic()" title="Voice">🎙</button>
+    <button class="sendbtn" onclick="send()" title="Bhejo">➤</button>
+  </div>
+  <div class="sbar" id="sbar">Ready — Hey DRISHTI bolkar shuru karein!</div>
 </div>
-<div class="status" id="status">Ready — Hey DRISHTI bolkar shuru karein!</div>
 
 <script>
+// ── CONFIG ──
 const API_KEY = "AIzaSyC5jyjCbNKYYFxklS7M7A9eKWd0MnFH35I";
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
+let history = [];
+let listening = false;
+let recog = null;
+
+const SYSTEM = `Tu DRISHTI hai — Vipul ka personal AI assistant.
+Tu Hindi aur Hinglish mein baat karta hai — bilkul dost ki tarah.
+Coding mein: poora working code de, Hindi mein line by line samjha.
+Website mein: step by step guide kar, simple bhasha mein.
+Hamesha encouraging reh: "Shabash Vipul!", "Bahut acha!", "Koi baat nahi, hota hai!"
+Jawab clear aur helpful rakh — 4-5 lines maximum jab tak code na ho.
+Agar code ho toh poora de, kuch bhi mat chhor.`;
+
+// ── MODE ──
 let currentMode = "chat";
-let isListening = false;
-let recognition = null;
-let chatHistory = [];
+const modeMsg = {
+  chat: "💬 Baat karo mode! Kuch bhi poochho — main hoon!",
+  code: "💻 Coding mode! Kaunsi language? Python, HTML, JavaScript, React?",
+  web:  "🌐 Website mode! Kaunsi website banana hai ya sikhni hai?",
+  voice:"🎙 Voice mode! Mic tap karo aur boliye kya chahiye..."
+};
 
-const SYSTEM_PROMPT = `Tu DRISHTI hai — ek helpful AI assistant jo Hindi, Hinglish aur English mein baat karta hai.
-Tu ek dost ki tarah baat karta hai — simple, clear aur helpful.
-Agar coding poochha toh poora code de aur Hindi mein samjha.
-Agar website poochha toh step by step guide kar.
-Hamesha encouraging reh — "Shabash!", "Bahut acha!", "Koi baat nahi!" use kar.
-Short aur clear jawab de — zyada lamba mat likh.`;
-
-function setMode(mode) {
-  currentMode = mode;
-  document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  const msgs = {
-    voice: "Voice mode on! Ab boliye kya jaanna hai...",
-    code: "Coding mode! Kaunsi coding sikhni hai? Python, HTML, JavaScript?",
-    web: "Website mode! Kaunsi website banana hai ya sikhni hai?",
-    chat: "Baat karo mode! Kuch bhi poochho — main hoon!"
-  };
-  addMsg("DRISHTI", msgs[mode]);
+function setMode(m, btn) {
+  currentMode = m;
+  document.querySelectorAll('.mbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  addMsg("DRISHTI", modeMsg[m]);
 }
 
+// ── MESSAGES ──
 function addMsg(who, text) {
-  const box = document.getElementById("chatBox");
-  const div = document.createElement("div");
-  div.className = who === "DRISHTI" ? "message drishti-msg" : "message user-msg";
-  div.innerHTML = who === "DRISHTI" 
-    ? `<div class="drishti-name">👁 DRISHTI</div>${text}`
-    : text;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
+  const chat = document.getElementById("chat");
+  // Remove typing indicator if present
+  const typing = document.getElementById("typing");
+  if (typing) typing.remove();
+
+  const d = document.createElement("div");
+  d.className = who === "DRISHTI" ? "bubble bot" : "bubble usr";
+
+  if (who === "DRISHTI") {
+    // Format code blocks
+    const formatted = text
+      .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\n/g, '<br>');
+    d.innerHTML = `<div class="bname">👁 DRISHTI</div>${formatted}`;
+  } else {
+    d.textContent = text;
+  }
+
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
 }
 
-async function sendMsg() {
-  const input = document.getElementById("userInput");
-  const msg = input.value.trim();
+function showTyping() {
+  const chat = document.getElementById("chat");
+  const d = document.createElement("div");
+  d.className = "typing";
+  d.id = "typing";
+  d.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function quickSend(msg) {
+  document.getElementById("inp").value = msg;
+  send();
+}
+
+// ── SEND ──
+async function send() {
+  const inp = document.getElementById("inp");
+  const msg = inp.value.trim();
   if (!msg) return;
-  input.value = "";
-  addMsg("User", msg);
-  document.getElementById("status").textContent = "DRISHTI soch rahi hai...";
-  
-  chatHistory.push({ role: "user", parts: [{ text: msg }] });
-  
+  inp.value = "";
+
+  addMsg("Vipul", msg);
+  showTyping();
+  setSbar("DRISHTI soch rahi hai... 🤔", true);
+
+  history.push({ role: "user", parts: [{ text: msg }] });
+
   try {
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: chatHistory
+        system_instruction: { parts: [{ text: SYSTEM }] },
+        contents: history,
+        generationConfig: {
+          temperature: 0.8,
+          maxOutputTokens: 1500
+        }
       })
     });
+
     const data = await res.json();
+
+    if (data.error) {
+      addMsg("DRISHTI", `⚠️ Error: ${data.error.message}\n\nAPI key check karo!`);
+      setSbar("Error! API key check karo.", false);
+      return;
+    }
+
     const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Kuch problem aayi, dobara try karo!";
-    chatHistory.push({ role: "model", parts: [{ text: reply }] });
+    history.push({ role: "model", parts: [{ text: reply }] });
     addMsg("DRISHTI", reply);
     speak(reply);
-    document.getElementById("status").textContent = "Ready!";
-  } catch(e) {
-    addMsg("DRISHTI", "Network error! Internet check karo.");
-    document.getElementById("status").textContent = "Error!";
+    setSbar("Ready! ✅", false);
+
+  } catch (e) {
+    addMsg("DRISHTI", `⚠️ Network error! Internet check karo.\n\nError: ${e.message}`);
+    setSbar("Network error!", false);
   }
 }
 
+// ── SPEAK ──
 function speak(text) {
-  const clean = text.replace(/[*#]/g, "").substring(0, 200);
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const clean = text.replace(/```[\s\S]*?```/g, 'code block').replace(/[*#`]/g, '').substring(0, 300);
   const u = new SpeechSynthesisUtterance(clean);
   u.lang = "hi-IN";
-  u.rate = 0.9;
+  u.rate = 0.88;
+  u.pitch = 1.1;
   speechSynthesis.speak(u);
 }
 
+// ── MIC ──
 function toggleMic() {
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    alert("Voice support nahi hai is browser mein. Chrome use karo!");
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) {
+    alert("Voice ke liye Chrome browser use karo!");
     return;
   }
-  if (isListening) {
-    recognition.stop();
-    return;
-  }
-  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.lang = "hi-IN";
-  recognition.continuous = false;
-  recognition.onstart = () => {
-    isListening = true;
-    document.getElementById("micBtn").classList.add("listening");
-    document.getElementById("status").textContent = "Sun rahi hoon... boliye!";
+  if (listening) { recog.stop(); return; }
+
+  recog = new SpeechRec();
+  recog.lang = "hi-IN";
+  recog.continuous = false;
+  recog.interimResults = false;
+
+  recog.onstart = () => {
+    listening = true;
+    document.getElementById("mic").classList.add("listening");
+    document.getElementById("mic").textContent = "🔴";
+    setSbar("Sun rahi hoon... boliye! 🎙", true);
   };
-  recognition.onresult = (e) => {
-    const text = e.results[0][0].transcript;
-    document.getElementById("userInput").value = text;
-    sendMsg();
+  recog.onresult = (e) => {
+    const t = e.results[0][0].transcript;
+    document.getElementById("inp").value = t;
+    setSbar(`Suna: "${t}"`, true);
+    setTimeout(send, 300);
   };
-  recognition.onend = () => {
-    isListening = false;
-    document.getElementById("micBtn").classList.remove("listening");
-    document.getElementById("status").textContent = "Ready!";
+  recog.onerror = (e) => {
+    setSbar("Voice error: " + e.error, false);
   };
-  recognition.start();
+  recog.onend = () => {
+    listening = false;
+    document.getElementById("mic").classList.remove("listening");
+    document.getElementById("mic").textContent = "🎙";
+    setSbar("Ready! ✅", false);
+  };
+  recog.start();
+}
+
+// ── STATUS ──
+function setSbar(msg, active) {
+  const s = document.getElementById("sbar");
+  s.textContent = msg;
+  s.className = active ? "sbar active" : "sbar";
 }
 </script>
 </body>
