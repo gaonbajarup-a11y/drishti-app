@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRISHTI AI</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #08000F;
+  color: white;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+.header {
+  text-align: center;
+  padding: 30px 0 20px;
+}
+.logo { font-size: 48px; color: #F59E0B; font-weight: bold; }
+.tagline { color: #A855F7; font-size: 14px; margin-top: 5px; }
+.chat-box {
+  width: 100%;
+  max-width: 700px;
+  background: #1E0A3C;
+  border-radius: 16px;
+  padding: 20px;
+  flex: 1;
+  min-height: 400px;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+.message {
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  max-width: 85%;
+  line-height: 1.5;
+}
+.user-msg {
+  background: #7C3AED;
+  margin-left: auto;
+  text-align: right;
+}
+.drishti-msg {
+  background: #130228;
+  border-left: 3px solid #F59E0B;
+}
+.drishti-name {
+  color: #F59E0B;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.icons-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.icon-btn {
+  background: #1E0A3C;
+  border: 2px solid #7C3AED;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.icon-btn:hover { background: #7C3AED; }
+.icon-btn.active { background: #7C3AED; border-color: #F59E0B; }
+.input-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 700px;
+}
+.text-input {
+  flex: 1;
+  background: #1E0A3C;
+  border: 2px solid #7C3AED;
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+}
+.send-btn {
+  background: #7C3AED;
+  border: none;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 20px;
+  cursor: pointer;
+}
+.mic-btn {
+  background: #EC4899;
+  border: none;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 20px;
+  cursor: pointer;
+}
+.mic-btn.listening { background: #DC2626; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+.status { color: #6B7280; font-size: 12px; text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">👁 DRISHTI</div>
+  <div class="tagline">Aapki Screen Dekhe. Hindi Mein Guide Kare. Hamesha Saath.</div>
+</div>
+
+<div class="icons-row">
+  <button class="icon-btn" onclick="setMode('voice')">🎙 Voice</button>
+  <button class="icon-btn" onclick="setMode('code')">💻 Coding</button>
+  <button class="icon-btn" onclick="setMode('web')">🌐 Website</button>
+  <button class="icon-btn" onclick="setMode('chat')">💬 Baat Karo</button>
+</div>
+
+<div class="chat-box" id="chatBox">
+  <div class="message drishti-msg">
+    <div class="drishti-name">👁 DRISHTI</div>
+    Namaste! Main DRISHTI hoon. Aap mujhse kuch bhi pooch sakte hain — coding, website, ya bas baat karo. Boliye!
+  </div>
+</div>
+
+<div class="input-row">
+  <input class="text-input" id="userInput" placeholder="Kuch bhi poochho..." onkeypress="if(event.key==='Enter')sendMsg()"/>
+  <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎙</button>
+  <button class="send-btn" onclick="sendMsg()">➤</button>
+</div>
+<div class="status" id="status">Ready — Hey DRISHTI bolkar shuru karein!</div>
+
+<script>
+const API_KEY = "AIzaSyCVD7WaEXwD97Z4PW2Utn84E82-KEsPqfo";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
+
+let currentMode = "chat";
+let isListening = false;
+let recognition = null;
+let chatHistory = [];
+
+const SYSTEM_PROMPT = `Tu DRISHTI hai — ek helpful AI assistant jo Hindi, Hinglish aur English mein baat karta hai.
+Tu ek dost ki tarah baat karta hai — simple, clear aur helpful.
+Agar coding poochha toh poora code de aur Hindi mein samjha.
+Agar website poochha toh step by step guide kar.
+Hamesha encouraging reh — "Shabash!", "Bahut acha!", "Koi baat nahi!" use kar.
+Short aur clear jawab de — zyada lamba mat likh.`;
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const msgs = {
+    voice: "Voice mode on! Ab boliye kya jaanna hai...",
+    code: "Coding mode! Kaunsi coding sikhni hai? Python, HTML, JavaScript?",
+    web: "Website mode! Kaunsi website banana hai ya sikhni hai?",
+    chat: "Baat karo mode! Kuch bhi poochho — main hoon!"
+  };
+  addMsg("DRISHTI", msgs[mode]);
+}
+
+function addMsg(who, text) {
+  const box = document.getElementById("chatBox");
+  const div = document.createElement("div");
+  div.className = who === "DRISHTI" ? "message drishti-msg" : "message user-msg";
+  div.innerHTML = who === "DRISHTI" 
+    ? `<div class="drishti-name">👁 DRISHTI</div>${text}`
+    : text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendMsg() {
+  const input = document.getElementById("userInput");
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = "";
+  addMsg("User", msg);
+  document.getElementById("status").textContent = "DRISHTI soch rahi hai...";
+  
+  chatHistory.push({ role: "user", parts: [{ text: msg }] });
+  
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Kuch problem aayi, dobara try karo!";
+    chatHistory.push({ role: "model", parts: [{ text: reply }] });
+    addMsg("DRISHTI", reply);
+    speak(reply);
+    document.getElementById("status").textContent = "Ready!";
+  } catch(e) {
+    addMsg("DRISHTI", "Network error! Internet check karo.");
+    document.getElementById("status").textContent = "Error!";
+  }
+}
+
+function speak(text) {
+  const clean = text.replace(/[*#]/g, "").substring(0, 200);
+  const u = new SpeechSynthesisUtterance(clean);
+  u.lang = "hi-IN";
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+function toggleMic() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert("Voice support nahi hai is browser mein. Chrome use karo!");
+    return;
+  }
+  if (isListening) {
+    recognition.stop();
+    return;
+  }
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = "hi-IN";
+  recognition.continuous = false;
+  recognition.onstart = () => {
+    isListening = true;
+    document.getElementById("micBtn").classList.add("listening");
+    document.getElementById("status").textContent = "Sun rahi hoon... boliye!";
+  };
+  recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    document.getElementById("userInput").value = text;
+    sendMsg();
+  };
+  recognition.onend = () => {
+    isListening = false;
+    document.getElementById("micBtn").classList.remove("listening");
+    document.getElementById("status").textContent = "Ready!";
+  };
+  recognition.start();
+}
+</script>
+</body>
+</html>
