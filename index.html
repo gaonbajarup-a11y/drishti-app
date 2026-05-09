@@ -72,7 +72,7 @@ body{background:#08000F;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-h
       <span class="chip" onclick="quickSend('Python mein calculator banao')">🐍 Python Calculator</span>
       <span class="chip" onclick="quickSend('Meri pehli website kaise banao?')">🌐 Pehli Website</span>
       <span class="chip" onclick="quickSend('JavaScript kya hai samjhao')">⚡ JavaScript</span>
-      <span class="chip" onclick="quickSend('Aaj ki news kya hai?')">💬 Baat Karo</span>
+      <span class="chip" onclick="quickSend('Aaj ki koi interesting baat batao')">💬 Baat Karo</span>
     </div>
   </div>
 </div>
@@ -86,7 +86,7 @@ body{background:#08000F;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-h
 </div>
 <script>
 const API_KEY = "AIzaSyC_DONbSVMULJJX_Jf6EbhW7V8WdMvE-as";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`;
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 let history=[],listening=false,recog=null;
 const SYSTEM=`Tu DRISHTI hai — Vipul ka personal AI assistant. Tu Hindi aur Hinglish mein baat karta hai — bilkul dost ki tarah. Coding mein poora working code de aur Hindi mein samjha. Website mein step by step guide kar. Hamesha encouraging reh: Shabash Vipul! Bahut acha! Koi baat nahi! Jawab clear rakho.`;
 const modeMsg={chat:"💬 Baat karo mode! Kuch bhi poochho!",code:"💻 Coding mode! Kaunsi language? Python, HTML, JavaScript?",web:"🌐 Website mode! Kya banana hai?",voice:"🎙 Voice mode! Mic tap karo!"};
@@ -115,7 +115,7 @@ async function send(){
   setSbar("DRISHTI soch rahi hai... 🤔",true);
   history.push({role:"user",parts:[{text:msg}]});
   try{
-    const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({system_instruction:{parts:[{text:SYSTEM}]},contents:history,generationConfig:{temperature:0.8,maxOutputTokens:1500}})});
+    const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:history,generationConfig:{temperature:0.8,maxOutputTokens:1500}})});
     const data=await res.json();
     if(data.error){addMsg("DRISHTI","⚠️ Error: "+data.error.message);setSbar("Error!",false);return;}
     const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||"Dobara try karo!";
