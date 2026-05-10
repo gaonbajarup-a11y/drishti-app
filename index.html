@@ -85,12 +85,32 @@ body{background:#08000F;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-h
   <div class="sbar" id="sbar">Ready — Kuch bhi poochho!</div>
 </div>
 <script>
-const API_KEY = "AIzaSyC_DONbSVMULJJX_Jf6EbhW7V8WdMvE-as";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
+const KEYS = [
+  "AIzaSyADhcm1znbxZjR6oSL1FM7DewxIrsimzC0",
+  "AIzaSyC_DONbSVMULJJX_Jf6EbhW7V8WdMvE-as"
+];
+const MODELS = [
+  "gemini-pro",
+  "gemini-1.0-pro",
+  "gemini-1.5-pro-latest"
+];
+let keyIndex = 0;
+let modelIndex = 0;
+
+function getURL() {
+  return `https://generativelanguage.googleapis.com/v1beta/models/${MODELS[modelIndex]}:generateContent?key=${KEYS[keyIndex]}`;
+}
+
 let history=[],listening=false,recog=null;
 const SYSTEM=`Tu DRISHTI hai — Vipul ka personal AI assistant. Tu Hindi aur Hinglish mein baat karta hai — bilkul dost ki tarah. Coding mein poora working code de aur Hindi mein samjha. Website mein step by step guide kar. Hamesha encouraging reh: Shabash Vipul! Bahut acha! Koi baat nahi! Jawab clear rakho.`;
 const modeMsg={chat:"💬 Baat karo mode! Kuch bhi poochho!",code:"💻 Coding mode! Kaunsi language? Python, HTML, JavaScript?",web:"🌐 Website mode! Kya banana hai?",voice:"🎙 Voice mode! Mic tap karo!"};
-function setMode(m,btn){document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');addMsg("DRISHTI",modeMsg[m]);}
+
+function setMode(m,btn){
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  addMsg("DRISHTI",modeMsg[m]);
+}
+
 function addMsg(who,text){
   const chat=document.getElementById("chat");
   const typing=document.getElementById("typing");
@@ -98,13 +118,30 @@ function addMsg(who,text){
   const d=document.createElement("div");
   d.className=who==="DRISHTI"?"bubble bot":"bubble usr";
   if(who==="DRISHTI"){
-    const fmt=text.replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>');
+    const fmt=text
+      .replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>')
+      .replace(/`([^`]+)`/g,'<code>$1</code>')
+      .replace(/\n/g,'<br>');
     d.innerHTML=`<div class="bname">👁 DRISHTI</div>${fmt}`;
   }else{d.textContent=text;}
-  chat.appendChild(d);chat.scrollTop=chat.scrollHeight;
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
 }
-function showTyping(){const chat=document.getElementById("chat");const d=document.createElement("div");d.className="typing";d.id="typing";d.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';chat.appendChild(d);chat.scrollTop=chat.scrollHeight;}
-function quickSend(msg){document.getElementById("inp").value=msg;send();}
+
+function showTyping(){
+  const chat=document.getElementById("chat");
+  const d=document.createElement("div");
+  d.className="typing";d.id="typing";
+  d.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function quickSend(msg){
+  document.getElementById("inp").value=msg;
+  send();
+}
+
 async function send(){
   const inp=document.getElementById("inp");
   const msg=inp.value.trim();
@@ -114,18 +151,64 @@ async function send(){
   showTyping();
   setSbar("DRISHTI soch rahi hai... 🤔",true);
   history.push({role:"user",parts:[{text:msg}]});
-  try{
-    const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:history,generationConfig:{temperature:0.8,maxOutputTokens:1500}})});
-    const data=await res.json();
-    if(data.error){addMsg("DRISHTI","⚠️ Error: "+data.error.message);setSbar("Error!",false);return;}
-    const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||"Dobara try karo!";
-    history.push({role:"model",parts:[{text:reply}]});
-    addMsg("DRISHTI",reply);speak(reply);setSbar("Ready! ✅",false);
-  }catch(e){addMsg("DRISHTI","⚠️ Network error! Internet check karo.");setSbar("Error!",false);}
+
+  let success = false;
+  for(let k=0; k<KEYS.length && !success; k++){
+    for(let m=0; m<MODELS.length && !success; m++){
+      keyIndex=k; modelIndex=m;
+      try{
+        const res=await fetch(getURL(),{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            contents:history,
+            generationConfig:{temperature:0.8,maxOutputTokens:1500}
+          })
+        });
+        const data=await res.json();
+        if(!data.error && data.candidates?.[0]?.content?.parts?.[0]?.text){
+          const reply=data.candidates[0].content.parts[0].text;
+          history.push({role:"model",parts:[{text:reply}]});
+          addMsg("DRISHTI",reply);
+          speak(reply);
+          setSbar("Ready! ✅",false);
+          success=true;
+        }
+      }catch(e){}
+    }
+  }
+  if(!success){
+    addMsg("DRISHTI","⚠️ Nayi API key chahiye! aistudio.google.com par jaao.");
+    setSbar("Error!",false);
+  }
 }
-function speak(text){if(!window.speechSynthesis)return;speechSynthesis.cancel();const clean=text.replace(/```[\s\S]*?```/g,'code block').replace(/[*#`]/g,'').substring(0,300);const u=new SpeechSynthesisUtterance(clean);u.lang="hi-IN";u.rate=0.88;u.pitch=1.1;speechSynthesis.speak(u);}
-function toggleMic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert("Chrome use karo!");return;}if(listening){recog.stop();return;}recog=new SR();recog.lang="hi-IN";recog.onstart=()=>{listening=true;document.getElementById("mic").classList.add("listening");setSbar("Sun rahi hoon... 🎙",true);};recog.onresult=(e)=>{document.getElementById("inp").value=e.results[0][0].transcript;send();};recog.onend=()=>{listening=false;document.getElementById("mic").classList.remove("listening");setSbar("Ready! ✅",false);};recog.start();}
-function setSbar(msg,active){const s=document.getElementById("sbar");s.textContent=msg;s.className=active?"sbar active":"sbar";}
+
+function speak(text){
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const clean=text.replace(/```[\s\S]*?```/g,'code block').replace(/[*#`]/g,'').substring(0,300);
+  const u=new SpeechSynthesisUtterance(clean);
+  u.lang="hi-IN";u.rate=0.88;u.pitch=1.1;
+  speechSynthesis.speak(u);
+}
+
+function toggleMic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert("Chrome use karo!");return;}
+  if(listening){recog.stop();return;}
+  recog=new SR();
+  recog.lang="hi-IN";
+  recog.onstart=()=>{listening=true;document.getElementById("mic").classList.add("listening");setSbar("Sun rahi hoon... 🎙",true);};
+  recog.onresult=(e)=>{document.getElementById("inp").value=e.results[0][0].transcript;send();};
+  recog.onend=()=>{listening=false;document.getElementById("mic").classList.remove("listening");setSbar("Ready! ✅",false);};
+  recog.start();
+}
+
+function setSbar(msg,active){
+  const s=document.getElementById("sbar");
+  s.textContent=msg;
+  s.className=active?"sbar active":"sbar";
+}
 </script>
 </body>
 </html>
